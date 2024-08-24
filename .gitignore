@@ -1,0 +1,32 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environment
+venv/
+ENV/
+env/
+.env
+
+# Django
+db.sqlite3
+
+# Docker
+*.log
+*.tmp
+docker-compose.override.yml
+
+# Coverage
+.coverage
+coverage.xml
+*.cover
+
+# Miscellaneous
+*.DS_Store
+*.swp
+*.swo
+
+# Ignore all files in the dbdata directory
+dbdata/
