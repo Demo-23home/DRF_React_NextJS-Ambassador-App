@@ -32,8 +32,7 @@ class LoginAPIView(APIView):
 
         if user is not None:
             if user.check_password(password):
-                jwt_authentication = JWTAutentication()
-                token = jwt_authentication.generate_jwt(user.id)
+                token = JWTAutentication.generate_jwt(user.id)
                 response = Response()
                 response.set_cookie(key="jwt", value=token, httponly=True)
                 response.data = {"Message": "Success"}
