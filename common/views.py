@@ -66,3 +66,19 @@ class LogOutAPIView(APIView):
         response.data = {"message": "success"}
 
         return response
+
+
+class ProfileAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        data = request.data
+
+        serializer = UserSerializer(user, data=data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
