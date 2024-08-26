@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from core.models import User
 from .serializers import UserSerializer
 from django.shortcuts import get_object_or_404
-from .Authentication import JWTAutentication
+from .Authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterAPIView(APIView):
@@ -32,10 +33,23 @@ class LoginAPIView(APIView):
 
         if user is not None:
             if user.check_password(password):
-                token = JWTAutentication.generate_jwt(user.id)
+                token = JWTAuthentication.generate_jwt(user.id)
                 response = Response()
                 response.set_cookie(key="jwt", value=token, httponly=True)
                 response.data = {"Message": "Success"}
                 return response
             return Response("Incorrect Password!")
         return Response("User is not found!")
+
+
+class UserAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user is not None:
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        else:
+            return Response("No User Found!")
