@@ -53,3 +53,16 @@ class UserAPIView(APIView):
             return Response(serializer.data)
         else:
             return Response("No User Found!")
+
+
+class LogOutAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = Response()
+        response.delete_cookie(key="jwt")
+
+        response.data = {"message": "success"}
+
+        return response
