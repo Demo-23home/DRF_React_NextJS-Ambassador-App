@@ -54,12 +54,10 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
-    
-    
 
 
 class Product(models.Model):
-    title = models.CharField( max_length=50)
-    description = models.TextField( max_length=50)
-    image = models.ImageField(null=True, blank=True)
+    title = models.CharField(max_length=50)
+    description = models.TextField(max_length=50)
+    image = models.CharField(max_length=50,null=True, blank=True)
     price = models.DecimalField(max_digits=5, decimal_places=2)
