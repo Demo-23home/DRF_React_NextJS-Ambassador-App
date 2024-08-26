@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Internal Apps
     "core",
+    "common",
+    "administrator",
     # External Modules
     "rest_framework",
 ]
