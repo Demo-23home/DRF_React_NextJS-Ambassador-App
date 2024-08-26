@@ -59,5 +59,13 @@ class User(AbstractUser):
 class Product(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField(max_length=50)
-    image = models.CharField(max_length=50,null=True, blank=True)
+    image = models.CharField(max_length=50, null=True, blank=True)
     price = models.DecimalField(max_digits=5, decimal_places=2)
+
+
+class Link(models.Model):
+    code = models.CharField(max_length=255)
+    user = models.ForeignKey("User", on_delete=models.CASCADE)
+    products = models.ManyToManyField("Product")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

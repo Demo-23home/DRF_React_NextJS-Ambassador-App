@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from core.models import User, Product
+from core.models import Link, User, Product
 from common.serializers import UserSerializer
 from rest_framework.response import Response
 from common.Authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, mixins
-from .serializers import ProductSerializer
+from .serializers import LinkSerializer, ProductSerializer
 
 
 class AmbassadorsAPIView(APIView):
@@ -25,7 +25,7 @@ class ProductGenericAPIView(
     mixins.RetrieveModelMixin,
     mixins.DestroyModelMixin,
     mixins.CreateModelMixin,
-    mixins.UpdateModelMixin
+    mixins.UpdateModelMixin,
 ):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -45,3 +45,13 @@ class ProductGenericAPIView(
 
     def delete(self, request, pk=None):
         return self.destroy(request, pk)
+
+
+class LinkAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        links = Link.objects.filter(user_id=user_id)
+        serializer = LinkSerializer(links, many=True)
+        return Response(serializer.data)
