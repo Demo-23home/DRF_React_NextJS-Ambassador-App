@@ -7,6 +7,7 @@ from .serializers import UserSerializer
 from django.shortcuts import get_object_or_404
 from .Authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import exceptions
 
 
 class RegisterAPIView(APIView):
@@ -68,7 +69,7 @@ class LogOutAPIView(APIView):
         return response
 
 
-class ProfileAPIView(APIView):
+class UpdateUserProfileAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -82,3 +83,20 @@ class ProfileAPIView(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+
+class UpdateUserPasswordAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        data = request.data
+        user = request.user
+
+        if data["password"] != data["confirm_password"]:
+            raise exceptions.APIException("Passwords Don't Match!")
+
+        user.set_password(data["password"])
+        user.save()
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
