@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from core.models import Link, User, Product
+from core.models import Link, Order, User, Product
 from common.serializers import UserSerializer
 from rest_framework.response import Response
 from common.Authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, mixins
-from .serializers import LinkSerializer, ProductSerializer
+from .serializers import LinkSerializer, OrderSerializer, ProductSerializer
 
 
 class AmbassadorsAPIView(APIView):
@@ -54,4 +54,17 @@ class LinkAPIView(APIView):
     def get(self, request, user_id):
         links = Link.objects.filter(user_id=user_id)
         serializer = LinkSerializer(links, many=True)
+        return Response(serializer.data)
+    
+    
+
+
+class OrderAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    
+    def get(self, request):
+        orders = Order.objects.filter(complete=True)
+        serializer = OrderSerializer(many=True)
         return Response(serializer.data)

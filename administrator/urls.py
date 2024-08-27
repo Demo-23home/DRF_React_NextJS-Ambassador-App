@@ -7,5 +7,6 @@ urlpatterns = [
     path("products/", views.ProductGenericAPIView.as_view()),
     path("products/<int:pk>/", views.ProductGenericAPIView.as_view()),
     path("links/<int:user_id>",  views.LinkAPIView.as_view()),
+    path("orders/",  views.OrderAPIView.as_view()),
 ]
  
