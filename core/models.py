@@ -69,3 +69,29 @@ class Link(models.Model):
     products = models.ManyToManyField("Product")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class Order(models.Model):
+    transaction_id = models.CharField(max_length=50)
+    user = models.ForeignKey("User", on_delete=models.SET_NULL, null=True)
+    code = models.CharField(max_length=50)
+    ambassador_email = models.EmailField(max_length=254)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=254)
+    address = models.CharField(max_length=50)
+    city = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+    zip = models.CharField(max_length=50)
+    complete = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey("Order", on_delete=models.CASCADE)
+    product_title = models.CharField( max_length=50)
+    price = models.DecimalField( max_digits=5, decimal_places=2)
+    quantity = models.PositiveIntegerField()
+    admin_revenue = models.DecimalField( max_digits=7, decimal_places=2)
+    ambassador_revenue = models.DecimalField( max_digits=7, decimal_places=2)
