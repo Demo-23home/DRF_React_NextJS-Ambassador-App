@@ -15,7 +15,7 @@ class RegisterAPIView(APIView):
         data = request.data.copy()
         if data["password"] != data["confirm_password"]:
             return Response("Passwords don't match")
-        data["is_ambassador"] = 0
+        data["is_ambassador"] = 'api/ambassador' in request.path  
         serializer = UserSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
