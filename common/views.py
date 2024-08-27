@@ -26,7 +26,10 @@ class RegisterAPIView(APIView):
 class LoginAPIView(APIView):
     def post(self, request):
         data = request.data
+        if not data['password']:
+            return Response("Password is Required")
 
+        scope = 'ambassador' if 'api/ambassador' in request.path else 'admin'
         email = data["email"]
         password = data["password"]
 
@@ -34,7 +37,7 @@ class LoginAPIView(APIView):
 
         if user is not None:
             if user.check_password(password):
-                token = JWTAuthentication.generate_jwt(user.id)
+                token = JWTAuthentication.generate_jwt(user.id, scope)
                 response = Response()
                 response.set_cookie(key="jwt", value=token, httponly=True)
                 response.data = {"Message": "Success"}

@@ -9,25 +9,35 @@ from django.shortcuts import get_object_or_404
 class JWTAuthentication(BaseAuthentication):
 
     def authenticate(self, request):
+        is_ambassador = "api/ambassador" in request.path
+
         token = request.COOKIES.get("jwt")
 
-        if token is not None:
+        if not token:
+            return None
 
-            try:
-                payload = jwt.decode(token, settings.SECRET_KEY, algorithms="HS256")
-            except jwt.ExpiredSignatureError:
-                raise exceptions.AuthenticationFailed("unauthenticated")
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            raise exceptions.AuthenticationFailed("unauthenticated")
 
-            user_id = payload["user_id"]
-            user = get_object_or_404(User, id=user_id)
+        if (is_ambassador and payload["scope"] != "ambassador") or (
+            not is_ambassador and payload["scope"] != "admin"
+        ):
+            raise exceptions.AuthenticationFailed("Invalid Scope!")
 
-            if user is not None:
-                return (user, None)
+        user = User.objects.get(pk=payload["user_id"])
+
+        if user is None:
+            raise exceptions.AuthenticationFailed("User not found!")
+
+        return (user, None)
 
     @staticmethod
-    def generate_jwt(id):
+    def generate_jwt(id, scope):
         payload = {
             "user_id": id,
+            "scope": scope,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
             "iat": datetime.datetime.utcnow(),
         }
