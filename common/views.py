@@ -15,7 +15,7 @@ class RegisterAPIView(APIView):
         data = request.data.copy()
         if data["password"] != data["confirm_password"]:
             return Response("Passwords don't match")
-        data["is_ambassador"] = 'api/ambassador' in request.path  
+        data["is_ambassador"] = "api/ambassador" in request.path
         serializer = UserSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -26,16 +26,18 @@ class RegisterAPIView(APIView):
 class LoginAPIView(APIView):
     def post(self, request):
         data = request.data
-        if not data['password']:
+        if not data["password"]:
             return Response("Password is Required")
 
-        scope = 'ambassador' if 'api/ambassador' in request.path else 'admin'
+        scope = "ambassador" if "api/ambassador" in request.path else "admin"
         email = data["email"]
         password = data["password"]
 
         user = get_object_or_404(User, email=email)
 
         if user is not None:
+            if user.is_ambassador and scope == "admin":
+                raise exceptions.AuthenticationFailed("Invalid Scope")
             if user.check_password(password):
                 token = JWTAuthentication.generate_jwt(user.id, scope)
                 response = Response()
