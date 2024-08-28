@@ -55,8 +55,12 @@ class UserAPIView(APIView):
     def get(self, request):
         user = request.user
         if user is not None:
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
+            data = UserSerializer(user).data
+            
+            if 'api/ambassador' in request.path:
+                data['revenue'] = user.revenue
+            
+            return Response(data)
         else:
             return Response("No User Found!")
 

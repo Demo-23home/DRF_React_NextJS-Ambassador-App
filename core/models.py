@@ -44,9 +44,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField(
-        max_length=50, unique=True
-    )  # Use EmailField for validation
+    email = models.EmailField(max_length=50, unique=True)
     is_ambassador = models.BooleanField(default=True)
     username = None
 
@@ -54,6 +52,16 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def revenue(self):
+        user_orders = Order.objects.filter(user_id=self.id, complete=True)
+        total_revenue = sum(order.ambassador_revenue for order in user_orders)
+        return total_revenue
 
 
 class Product(models.Model):
@@ -72,7 +80,7 @@ class Link(models.Model):
 
 
 class Order(models.Model):
-    transaction_id = models.CharField(max_length=50)
+    transaction_id = models.CharField(max_length=50, null=True, blank=True)
     user = models.ForeignKey("User", on_delete=models.SET_NULL, null=True)
     code = models.CharField(max_length=50)
     ambassador_email = models.EmailField(max_length=254)
@@ -80,18 +88,30 @@ class Order(models.Model):
     last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254)
     address = models.CharField(max_length=50)
-    city = models.CharField(max_length=50)
-    country = models.CharField(max_length=50)
-    zip = models.CharField(max_length=50)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    country = models.CharField(max_length=50, null=True, blank=True)
+    zip = models.CharField(max_length=50, null=True, blank=True)
     complete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @property
+    def ambassador_revenue(self):
+        order_items = OrderItem.objects.filter(order_id=self.id)
+        total_revenue = sum(
+            (order_item.ambassador_revenue) for order_item in order_items
+        )
+        return total_revenue
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey("Order", on_delete=models.CASCADE)
-    product_title = models.CharField( max_length=50)
-    price = models.DecimalField( max_digits=5, decimal_places=2)
+    product_title = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
     quantity = models.PositiveIntegerField()
-    admin_revenue = models.DecimalField( max_digits=7, decimal_places=2)
-    ambassador_revenue = models.DecimalField( max_digits=7, decimal_places=2)
+    admin_revenue = models.DecimalField(max_digits=7, decimal_places=2)
+    ambassador_revenue = models.DecimalField(max_digits=7, decimal_places=2)
