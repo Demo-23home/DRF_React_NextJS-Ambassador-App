@@ -3,7 +3,7 @@ from django.views.decorators.cache import cache_page
 from rest_framework.views import APIView
 from administrator.serializers import LinkSerializer
 from common.Authentication import JWTAuthentication
-from core.models import Link, Order, Product
+from core.models import Link, Order, Product, User
 from .serializers import ProductSerializer
 from rest_framework.response import Response
 from django.core.cache import cache
@@ -134,3 +134,22 @@ class StatsAPIView(APIView):
             "revenue": orders_revenue,
         }
         return formatted_stats
+
+
+class RankingsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        ambassadors = User.objects.filter(is_ambassador=True)
+
+        response = list(
+            {"name": ambassador.name, "revenue": ambassador.revenue}
+            for ambassador in ambassadors
+        )
+        
+        
+        response.sort(key=lambda a:a['revenue'], reverse=True)
+        print(response)
+
+        return Response(response)
