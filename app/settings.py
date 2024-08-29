@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     # External Modules
     "rest_framework",
     "corsheaders",
+    
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,9 @@ WSGI_APPLICATION = "app.wsgi.application"
 # }
 
 
+# Postgres Data Base
+
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -107,6 +111,15 @@ DATABASES = {
 }
 
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/0",  # Use the service name and internal port here
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -148,11 +161,11 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Setting New User Model 
+# Setting New User Model
 AUTH_USER_MODEL = "core.User"
 
 
-# CORSheaders Settings 
+# CORSheaders Settings
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
