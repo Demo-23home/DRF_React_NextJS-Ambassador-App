@@ -1,3 +1,4 @@
+import math
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework.views import APIView
@@ -20,13 +21,20 @@ class ProductBackendAPIView(APIView):
     def get(self, request):
         products = cache.get("products_backend")
 
+        # Caching Function
         if not products:
-            time.sleep(4)
+            # time.sleep(4)
             products = list(Product.objects.all())
             cache.set("products_backend", products, timeout=60 * 30)  # 30 min
+
+        # Query Params
         search_query = request.query_params.get("search", "")
         sorting_query = request.query_params.get("sort", "")
+        page = int(request.query_params.get("page", 1))
+        if page == 0:
+            return Response("Not A Valid Page")
 
+        # Search Function
         if search_query:
             products = list(
                 [
@@ -36,6 +44,8 @@ class ProductBackendAPIView(APIView):
                     or (search_query.lower() in product.description.lower())
                 ]
             )
+
+        # Sort Function
         if sorting_query:
             if sorting_query == "asc":
                 products.sort(key=lambda p: p.price)
@@ -45,6 +55,29 @@ class ProductBackendAPIView(APIView):
                 return Response(
                     "Not A Valid Sorting Query, use either 'asc' or 'desc' !"
                 )
+        # Paginating Function
+        total_products = len(products)
+        products_per_page = 10
+        start = (page - 1) * products_per_page
+        end = page * products_per_page
+        if page:
+            if page == 0:
+                return Response("Not A Valid Page")
+            elif page == 1:
+                last_page = None
+            else:
+                last_page = page - 1
 
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        # Final Response
+        data = ProductSerializer(products[start:end], many=True).data
+
+        return Response(
+            {
+                "data": data,
+                "meta": {
+                    "total": total_products,
+                    "page": page,
+                    "last_page": last_page,
+                },
+            }
+        )
