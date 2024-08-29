@@ -3,7 +3,7 @@ from django.views.decorators.cache import cache_page
 from rest_framework.views import APIView
 from administrator.serializers import LinkSerializer
 from common.Authentication import JWTAuthentication
-from core.models import Product
+from core.models import Link, Order, Product
 from .serializers import ProductSerializer
 from rest_framework.response import Response
 from django.core.cache import cache
@@ -109,3 +109,28 @@ class LinkAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
+
+class StatsAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        links = Link.objects.filter(user=user)
+
+        stats = [self.format(link) for link in links]
+        return Response(stats)
+
+    def format(self, link):
+        link_code = link.code
+        orders = Order.objects.filter(code=link_code, complete=1)
+
+        orders_revenue = sum(order.ambassador_revenue for order in orders)
+
+        formatted_stats = {
+            "code": link_code,
+            "count": len(orders),
+            "revenue": orders_revenue,
+        }
+        return formatted_stats

@@ -7,5 +7,5 @@ urlpatterns = [
     path("products/frontend/", views.ProductFrontendAPIView.as_view()),
     path("products/backend/", views.ProductBackendAPIView.as_view()),
     path("links/", views.LinkAPIView.as_view()),
-    
+    path("stats/", views.StatsAPIView.as_view()),
 ]
