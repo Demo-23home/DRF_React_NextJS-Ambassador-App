@@ -1,15 +1,20 @@
-import math
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework.views import APIView
+from administrator.serializers import LinkSerializer
+from common.Authentication import JWTAuthentication
 from core.models import Product
 from .serializers import ProductSerializer
 from rest_framework.response import Response
 from django.core.cache import cache
-import time
+import time, random, string
+from rest_framework.permissions import IsAuthenticated
 
 
 class ProductFrontendAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @method_decorator(cache_page(60 * 60 * 2, key_prefix="products_frontend"))
     def get(self, _):
         products = Product.objects.all()
@@ -18,6 +23,9 @@ class ProductFrontendAPIView(APIView):
 
 
 class ProductBackendAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         products = cache.get("products_backend")
 
@@ -81,3 +89,23 @@ class ProductBackendAPIView(APIView):
                 },
             }
         )
+
+
+class LinkAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        products = request.data["products"]
+        data = {
+            "user": user.id,
+            "products": products,
+            "code": "".join(
+                random.choices(string.ascii_lowercase + string.digits, k=6)
+            ),
+        }
+        serializer = LinkSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
