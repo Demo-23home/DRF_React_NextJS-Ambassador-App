@@ -25,6 +25,8 @@ class ProductBackendAPIView(APIView):
             products = list(Product.objects.all())
             cache.set("products_backend", products, timeout=60 * 30)  # 30 min
         search_query = request.query_params.get("search", "")
+        sorting_query = request.query_params.get("sort", "")
+
         if search_query:
             products = list(
                 [
@@ -34,5 +36,15 @@ class ProductBackendAPIView(APIView):
                     or (search_query.lower() in product.description.lower())
                 ]
             )
+        if sorting_query:
+            if sorting_query == "asc":
+                products.sort(key=lambda p: p.price)
+            elif sorting_query == "desc":
+                products.sort(key=lambda p: p.price, reverse=True)
+            else:
+                return Response(
+                    "Not A Valid Sorting Query, use either 'asc' or 'desc' !"
+                )
+
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
