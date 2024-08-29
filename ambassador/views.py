@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from django.core.cache import cache
 import time, random, string
 from rest_framework.permissions import IsAuthenticated
+from django_redis import get_redis_connection
 
 
 class ProductFrontendAPIView(APIView):
@@ -141,15 +142,9 @@ class RankingsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        ambassadors = User.objects.filter(is_ambassador=True)
+        conn = get_redis_connection("default")
 
-        response = list(
-            {"name": ambassador.name, "revenue": ambassador.revenue}
-            for ambassador in ambassadors
-        )
-        
-        
-        response.sort(key=lambda a:a['revenue'], reverse=True)
-        print(response)
+        rankings = conn.zrevrangebyscore("rankings", min=0, max=1000, withscores=True)
 
+        response = {ranking[0].decode("utf-8"): ranking[1] for ranking in rankings}
         return Response(response)
