@@ -23,7 +23,7 @@ class ProductBackendAPIView(APIView):
 
         # Caching Function
         if not products:
-            # time.sleep(4)
+            time.sleep(2)
             products = list(Product.objects.all())
             cache.set("products_backend", products, timeout=60 * 30)  # 30 min
 

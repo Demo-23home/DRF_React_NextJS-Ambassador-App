@@ -7,6 +7,12 @@ from common.Authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, mixins
 from .serializers import LinkSerializer, OrderSerializer, ProductSerializer
+from django.core.cache import cache
+
+
+def clear_cache(*args):
+    for arg in args:
+        cache.delete(arg)
 
 
 class AmbassadorsAPIView(APIView):
@@ -38,13 +44,19 @@ class ProductGenericAPIView(
         return self.list(request)
 
     def post(self, request):
-        return self.create(request)
+        response = self.create(request)
+        clear_cache("products_backend", "products_frontend")
+        return response
 
     def put(self, request, pk=None):
-        return self.partial_update(request, pk)
+        response = self.partial_update(request, pk)
+        clear_cache("products_backend", "products_frontend")
+        return response
 
     def delete(self, request, pk=None):
-        return self.destroy(request, pk)
+        response = self.destroy(request, pk)
+        clear_cache("products_backend", "products_frontend")
+        return response
 
 
 class LinkAPIView(APIView):
@@ -55,15 +67,12 @@ class LinkAPIView(APIView):
         links = Link.objects.filter(user_id=user_id)
         serializer = LinkSerializer(links, many=True)
         return Response(serializer.data)
-    
-    
 
 
 class OrderAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    
-    
+
     def get(self, request):
         orders = Order.objects.filter(complete=True)
         serializer = OrderSerializer(many=True)
