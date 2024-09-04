@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "common",
     "administrator",
     "ambassador",
+    "checkout",
     # External Modules
     "rest_framework",
     "corsheaders",
