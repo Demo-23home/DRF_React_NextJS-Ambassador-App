@@ -1,12 +1,15 @@
 import decimal
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+import stripe
+import stripe.checkout
 from .serializers import LinkSerializer, OrderSerializer
 from common.Authentication import JWTAuthentication
 from core.models import Link, Order, OrderItem, Product
 from rest_framework.response import Response
 from rest_framework import exceptions, status
 from django.db import transaction
+from django.conf import settings
 
 # Create your views here.
 
@@ -28,7 +31,7 @@ class OrderAPIView(APIView):
 
     @transaction.atomic
     def post(self, request):
-        try: 
+        try:
             data = request.data
             code = data["code"]
             link = Link.objects.filter(code=code).first()
@@ -51,6 +54,8 @@ class OrderAPIView(APIView):
             with transaction.atomic():
                 order.save()
 
+            line_items = []
+
             for item in products:
                 product = Product.objects.get(id=item["product_id"])
                 quantity = decimal.Decimal(item["quantity"])
@@ -64,8 +69,35 @@ class OrderAPIView(APIView):
                 order_item.admin_revenue = product.price * decimal.Decimal(0.9)
                 with transaction.atomic():
                     order_item.save()
-            return Response({"message": "success"})
-        except: 
-            transaction.rollback()
-            return Response("Error Occurred")
 
+                line_items.append(
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "product_data": {
+                                "name": product.title,
+                                "description": product.description,
+                                "images": [product.image],
+                            },
+                            "unit_amount": int(product.price),
+                        },
+                        "quantity": int(quantity),
+                    }
+                )
+
+            stripe.api_key = settings.STRIPE_SECRETEKEY
+
+            source = stripe.checkout.Session.create(
+                success_url="http://localhost:5000/success?source={CHECKOUT_SESSION_ID}",
+                cancel_url="http://localhost:5000/error",
+                line_items=line_items,
+                mode="payment",
+                payment_method_types=["card"],
+            )
+            with transaction.atomic():
+                order.transaction_id = source["id"]
+            order.save()
+            return Response(source)
+        except:
+            transaction.rollback()
+        return Response("Error Occurred")
