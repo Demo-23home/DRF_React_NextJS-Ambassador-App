@@ -106,6 +106,14 @@ class Order(models.Model):
             (order_item.ambassador_revenue) for order_item in order_items
         )
         return total_revenue
+    
+    @property
+    def admin_revenue(self):
+        order_items = OrderItem.objects.filter(order_id=self.id)
+        total_revenue = sum(
+            (order_item.admin_revenue) for order_item in order_items
+        )
+        return total_revenue
 
 
 class OrderItem(models.Model):

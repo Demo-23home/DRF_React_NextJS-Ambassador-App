@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -181,3 +181,15 @@ REST_FRAMEWORK = {
 
 
 STRIPE_SECRETEKEY = os.environ.get('STRIPE_SECRETEKEY')
+
+
+
+# MailHog Configurations
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Use the Docker host to connect to MailHog running on your local machine
+EMAIL_HOST = '172.17.0.1'  # Replace with your actual Docker host IP
+
+EMAIL_PORT = 1025
+
+EMAIL_USE_TLS = False
