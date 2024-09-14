@@ -1,51 +1,31 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import React, { SyntheticEvent, useState } from "react";
 import "../Login.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [redirect, setRedirect] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submit = async (e: SyntheticEvent) => {
     e.preventDefault();
 
     try {
-      // Replace with your actual API endpoint
-      const response = await axios.post(
-        "http://localhost:8000/api/admin/login/",
-        formData
+      await axios.post(
+        "/login/",
+        { email: email, password: password },
+        { withCredentials: true }
       );
 
-      if (response.status === 200) {
-        // Login successful, redirect to the dashboard or another page
-        setRedirect(true);
-      }
+      navigate("/"); // Directly navigate after the request
     } catch (error) {
       console.error("Login failed", error);
     }
   };
 
-  // Redirect to /dashboard if redirect state is true
-  if (redirect) {
-    navigate("/");
-    return null; // Prevent rendering of the form after redirect
-  }
-
   return (
-    <form className="form-signin" onSubmit={handleSubmit}>
+    <form className="form-signin" onSubmit={submit}>
       <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
       <label htmlFor="inputEmail" className="sr-only">
         Email address
@@ -53,12 +33,10 @@ const Login = () => {
       <input
         type="email"
         id="inputEmail"
-        name="email"
         className="form-control"
         placeholder="Email address"
         required
-        value={formData.email}
-        onChange={handleChange}
+        onChange={(e) => setEmail(e.target.value)}
       />
       <label htmlFor="inputPassword" className="sr-only">
         Password
@@ -66,12 +44,10 @@ const Login = () => {
       <input
         type="password"
         id="inputPassword"
-        name="password"
         className="form-control"
         placeholder="Password"
         required
-        value={formData.password}
-        onChange={handleChange}
+        onChange={(e) => setPassword(e.target.value)}
       />
       <button className="btn btn-lg btn-primary btn-block" type="submit">
         Sign in

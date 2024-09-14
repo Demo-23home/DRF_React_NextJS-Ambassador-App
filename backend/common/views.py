@@ -41,7 +41,14 @@ class LoginAPIView(APIView):
             if user.check_password(password):
                 token = JWTAuthentication.generate_jwt(user.id, scope)
                 response = Response()
-                response.set_cookie(key="jwt", value=token, httponly=True)
+                response.set_cookie(
+                    key="jwt",
+                    value=token,
+                    httponly=True,
+                    samesite="None",  # Allows cross-site requests
+                    secure= False,  # Secure cookies only in production (HTTPS)
+                )
+
                 response.data = {"Message": "Success"}
                 return response
             return Response("Incorrect Password!")
@@ -56,10 +63,10 @@ class UserAPIView(APIView):
         user = request.user
         if user is not None:
             data = UserSerializer(user).data
-            
-            if 'api/ambassador' in request.path:
-                data['revenue'] = user.revenue
-            
+
+            if "api/ambassador" in request.path:
+                data["revenue"] = user.revenue
+
             return Response(data)
         else:
             return Response("No User Found!")

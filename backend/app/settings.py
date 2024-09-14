@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     # External Modules
     "rest_framework",
     "corsheaders",
-    
 ]
 
 MIDDLEWARE = [
@@ -170,6 +169,9 @@ AUTH_USER_MODEL = "core.User"
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 # RESTframework AuthenticataionClasses
 # Django Rest Framework settings
 REST_FRAMEWORK = {
@@ -180,15 +182,14 @@ REST_FRAMEWORK = {
 }
 
 
-STRIPE_SECRETEKEY = os.environ.get('STRIPE_SECRETEKEY')
-
+STRIPE_SECRETEKEY = os.environ.get("STRIPE_SECRETEKEY")
 
 
 # MailHog Configurations
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # Use the Docker host to connect to MailHog running on your local machine
-EMAIL_HOST = '172.17.0.1'  # Replace with your actual Docker host IP
+EMAIL_HOST = "172.17.0.1"  # Replace with your actual Docker host IP
 
 EMAIL_PORT = 1025
 

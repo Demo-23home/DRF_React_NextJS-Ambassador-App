@@ -43,7 +43,7 @@ export default function Register() {
     };
 
     axios
-      .post("http://localhost:8000/api/admin/register/", userData)
+      .post("register/", userData)
       .then((response) => {
         console.log("Registration successful:", response.data);
         // Set redirect state to true on successful registration
