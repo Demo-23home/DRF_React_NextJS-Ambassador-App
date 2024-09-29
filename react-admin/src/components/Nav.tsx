@@ -1,18 +1,27 @@
 // Nav.js
-import React from 'react';
+import React from "react";
+import { User } from "../models/user";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
-const Nav = () => {
+const Nav = (props: { user: User | null }) => {
+  const logout = async () => {  
+    await axios.post('/logout/')
+  }
   return (
     <nav className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
       <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
         Company name
       </a>
-      <ul className="navbar-nav px-3">
-        <li className="nav-item text-nowrap">
-          <a className="nav-link" href="#">
-            Sign out
-          </a>
-        </li>
+      <ul className="my-2 my-md-0 mr-md-3">
+        <Link className="p-2 text-white text-decoration-none" to="/profile">
+          {" "}
+          {props.user?.first_name} {props.user?.last_name}
+        </Link>
+        <Link className="p-2 text-white text-decoration-none" to="/login" onClick={logout}>
+          {" "}
+          Sign out{" "}
+        </Link>
       </ul>
     </nav>
   );
