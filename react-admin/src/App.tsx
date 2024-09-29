@@ -1,18 +1,18 @@
 import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import Users from "./pages/Users";
 import { Route, BrowserRouter, Routes } from "react-router-dom";
+import Users from "./pages/Users";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import RedirectToUsers from "./components/RedirectToUsers";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/"  Component={Users} />
-        <Route path="/login" Component={Login} />
-        <Route path="/register" Component={Register} />
+        <Route path="/" element={<RedirectToUsers />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   );
