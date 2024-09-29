@@ -181,7 +181,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-
 STRIPE_SECRETEKEY = os.environ.get("STRIPE_SECRETEKEY")
 
 

@@ -12,11 +12,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      await axios.post(
-        "/login/",
-        { email: email, password: password },
-        { withCredentials: true }
-      );
+      await axios.post("/login/", { email: email, password: password });
 
       navigate("/"); // Directly navigate after the request
     } catch (error) {

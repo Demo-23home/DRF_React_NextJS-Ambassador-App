@@ -46,7 +46,7 @@ class LoginAPIView(APIView):
                     value=token,
                     httponly=True,
                     samesite="None",  # Allows cross-site requests
-                    secure= False,  # Secure cookies only in production (HTTPS)
+                    secure= True,  # Secure cookies only in production (HTTPS)
                 )
 
                 response.data = {"Message": "Success"}
