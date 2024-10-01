@@ -14,11 +14,13 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const navigate = useNavigate();
 
   const handlePageChange = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -46,6 +48,10 @@ const Products = () => {
       axios.delete(`products/${id}/`);
       setProducts(products.filter((product) => product.id != id));
     }
+  };
+
+  const handleUpdate = (id: number) => {
+    navigate(`edit/${id}/`)
   };
 
   return (
@@ -84,6 +90,12 @@ const Products = () => {
                   <TableCell>{product.description}</TableCell>
                   <TableCell>{product.price}</TableCell>
                   <TableCell>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleUpdate(product.id)}
+                    >
+                      Update
+                    </Button>{" "}
                     <Button
                       variant="contained"
                       style={{ backgroundColor: "red", color: "white" }}

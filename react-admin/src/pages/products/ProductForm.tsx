@@ -1,8 +1,8 @@
-import React, { useState, SyntheticEvent } from "react";
+import React, { useState, SyntheticEvent, useEffect } from "react";
 import Layout from "../../components/Layout";
 import { Button, TextField } from "@mui/material";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const ProductForm = () => {
   const [title, setTitle] = useState("");
@@ -10,6 +10,27 @@ const ProductForm = () => {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (id) {
+        try {
+          const {
+            data: { title, image, price, description },
+          } = await axios.get(`products/${id}`);
+          setTitle(title);
+          setImage(image);
+          setPrice(price);
+          setDescription(description);
+        } catch (error) {
+          console.error("Error fetching product data:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -19,6 +40,14 @@ const ProductForm = () => {
       price: price,
       description: description,
     };
+
+    if (id) {
+      try {
+        axios.put(`/products/${id}/`, data);
+      } catch (e) {
+        console.log(e);
+      }
+    }
 
     try {
       axios
@@ -42,6 +71,7 @@ const ProductForm = () => {
           <TextField
             label="Title"
             variant="standard"
+            value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
@@ -49,6 +79,7 @@ const ProductForm = () => {
           <TextField
             label="Image"
             variant="standard"
+            value={image}
             onChange={(e) => setImage(e.target.value)}
           />
         </div>
@@ -56,6 +87,7 @@ const ProductForm = () => {
           <TextField
             label="Price"
             variant="standard"
+            value={price}
             onChange={(e) => setPrice(e.target.value)}
           />
         </div>
@@ -63,6 +95,7 @@ const ProductForm = () => {
           <TextField
             label="Description"
             variant="standard"
+            value={description}
             rows={4}
             multiline
             onChange={(e) => setDescription(e.target.value)}

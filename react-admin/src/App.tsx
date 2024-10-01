@@ -15,6 +15,7 @@ function App() {
         <Route path="/" element={<RedirectToUsers />} />
         <Route path="/users" element={<Users />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/edit/:id" element={<ProductForm />} />
         <Route path="/products/create" element={<ProductForm />} />
         <Route path="/users/:id/links" element={<Links />} />
         <Route path="/login" element={<Login />} />
