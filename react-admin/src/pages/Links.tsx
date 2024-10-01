@@ -43,7 +43,7 @@ const Links = () => {
     (async () => {
       if (id) {
         const { data } = await axios.get(`links/${id}`);
-        console.log(data)
+        console.log(data);
         setLinks(data);
       }
     })();
@@ -69,11 +69,8 @@ const Links = () => {
                   <TableCell>{link.id}</TableCell>
                   <TableCell>{link.code}</TableCell>
                   <TableCell>{link.orders.length}</TableCell>
-                  {/* <TableCell>{link.orders}</TableCell> */}
                   <TableCell>
-                    <Button variant="contained" color="primary">
-                      View
-                    </Button>
+                    {link.orders.reduce((s, o) => o.total + s, 0)}
                   </TableCell>
                 </TableRow>
               );
