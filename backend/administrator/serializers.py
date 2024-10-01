@@ -9,6 +9,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class LinkSerializer(serializers.ModelSerializer):
+    orders = serializers.SerializerMethodField()
+
+    def get_orders(self, obj):
+        list_orders = Order.objects.filter(code=obj.code)
+        serializer = OrderSerializer(list_orders, many=True)
+        orders = serializer.data
+        return orders
+
     class Meta:
         model = Link
         fields = "__all__"
@@ -21,7 +29,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True)
+    order_items = OrderItemSerializer(many=True)
     total = serializers.SerializerMethodField()
 
     class Meta:
@@ -31,4 +39,3 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_total(self, obj):
         items = OrderItem.objects.filter(order_id=obj.id)
         return sum((item.price * item.quantity) for item in items)
- 

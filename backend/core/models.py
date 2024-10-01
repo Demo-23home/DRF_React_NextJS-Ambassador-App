@@ -106,7 +106,7 @@ class Order(models.Model):
             (order_item.ambassador_revenue) for order_item in order_items
         )
         return total_revenue
-    
+
     @property
     def admin_revenue(self):
         order_items = OrderItem.objects.filter(order_id=self.id)
@@ -117,7 +117,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey("Order", on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        "Order", on_delete=models.CASCADE, related_name='order_items')
     product_title = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=5, decimal_places=2)
     quantity = models.PositiveIntegerField()

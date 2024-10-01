@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import axios from "axios";
-import { User } from "../models/user";
+import { Link as LinkModel } from "../models/Link"; // Renamed to avoid confusion with `react-router-dom`
 import {
   Table,
   TableBody,
@@ -13,18 +13,15 @@ import {
   Box,
   Button,
 } from "@mui/material";
+import { useParams } from "react-router-dom";
 
-const Users = () => {
-  const [users, setUsers] = useState<User[]>([]);
+const Links = () => {
+  const [links, setLinks] = useState<LinkModel[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await axios.get("/ambassadors/");
-      setUsers(data);
-    })();
-  }, []);
+  // Use `useParams` hook to get the route parameter
+  const { id } = useParams<{ id: string }>();
 
   // Function to handle page change
   const handlePageChange = (
@@ -42,33 +39,42 @@ const Users = () => {
     setPage(0); // Reset to the first page whenever rows per page changes
   };
 
+  useEffect(() => {
+    (async () => {
+      if (id) {
+        const { data } = await axios.get(`links/${id}`);
+        console.log(data)
+        setLinks(data);
+      }
+    })();
+  }, [id]);
+
   return (
     <Layout>
       <Table className="table table-striped table-sm">
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Actions</TableCell>
+            <TableCell>Code</TableCell>
+            <TableCell>Count</TableCell>
+            <TableCell>Revenue</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {users
+          {links
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Adjust data based on current page and rowsPerPage
-            .map((user) => {
+            .map((link) => {
               return (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
+                <TableRow key={link.id}>
+                  <TableCell>{link.id}</TableCell>
+                  <TableCell>{link.code}</TableCell>
+                  <TableCell>{link.orders.length}</TableCell>
+                  {/* <TableCell>{link.orders}</TableCell> */}
                   <TableCell>
-                    {user.first_name} {user.last_name}
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Button variant="contained" color="primary" href={`/users/${user.id}/links`}>
+                    <Button variant="contained" color="primary">
                       View
                     </Button>
-                  </TableCell>{" "}
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -79,7 +85,7 @@ const Users = () => {
               {/* Use Box to customize the alignment */}
               <Box display="flex" justifyContent="flex-start">
                 <TablePagination
-                  count={users.length}
+                  count={links.length}
                   page={page}
                   onPageChange={handlePageChange}
                   rowsPerPage={rowsPerPage}
@@ -96,4 +102,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Links;
