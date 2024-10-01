@@ -37,7 +37,6 @@ const Products = () => {
   useEffect(() => {
     (async () => {
       const { data } = await axios.get("/products");
-      console.log(data);
       setProducts(data);
     })();
   }, []);
@@ -51,6 +50,15 @@ const Products = () => {
 
   return (
     <Layout>
+      <div className="pt-3 pb-2 mb-3 border-bottom">
+        <Button
+          variant="contained"
+          href={"products/create/"}
+          onClick={() => ""}
+        >
+          Add
+        </Button>
+      </div>
       <Table className="table table-striped table-sm">
         <TableHead>
           <TableRow>
@@ -78,7 +86,7 @@ const Products = () => {
                   <TableCell>
                     <Button
                       variant="contained"
-                      style={{ backgroundColor: 'red', color: 'white' }}
+                      style={{ backgroundColor: "red", color: "white" }}
                       onClick={() => handleDelete(product.id)}
                     >
                       Delete
