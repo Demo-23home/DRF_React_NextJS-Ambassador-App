@@ -32,7 +32,7 @@ const ProductForm = () => {
     fetchData();
   }, [id]);
 
-  const handleSubmit = (e: SyntheticEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
     const data = {
       title: title,
@@ -43,14 +43,14 @@ const ProductForm = () => {
 
     if (id) {
       try {
-        axios.put(`/products/${id}/`, data);
+        await axios.put(`/products/${id}/`, data);
       } catch (e) {
         console.log(e);
       }
     }
 
     try {
-      axios
+      await axios
         .post("/products/", data)
         .then((res) => {
           console.log(res);

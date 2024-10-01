@@ -6,8 +6,8 @@ from faker import Faker
 class Command(BaseCommand):
     def handle(self, *args, **options):
         faker = Faker()
-        orders_number = 3
-        user_id = 38
+        orders_number = 20
+        user_id = 5
         user = User.objects.get(id=user_id)
         for i in range(orders_number):
             order = Order.objects.create(
