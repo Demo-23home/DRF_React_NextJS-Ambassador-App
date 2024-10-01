@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
-import Layout from "../components/Layout";
+import React, { useState } from "react";
+import { Product } from "../../models/products";
+import { useEffect } from "react";
 import axios from "axios";
-import { Link as LinkModel } from "../models/Link"; // Renamed to avoid confusion with `react-router-dom`
+import Layout from "../../components/Layout";
 import {
+  Box,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -10,16 +13,12 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Box,
-  Button,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
 
-const Links = () => {
-  const [links, setLinks] = useState<LinkModel[]>([]);
+const Products = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { id } = useParams<{ id: string }>();
 
   const handlePageChange = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -37,13 +36,18 @@ const Links = () => {
 
   useEffect(() => {
     (async () => {
-      if (id) {
-        const { data } = await axios.get(`links/${id}`);
-        console.log(data);
-        setLinks(data);
-      }
+      const { data } = await axios.get("/products");
+      console.log(data);
+      setProducts(data);
     })();
-  }, [id]);
+  }, []);
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("Are you Sure ?")) {
+      axios.delete(`products/${id}/`);
+      setProducts(products.filter((product) => product.id != id));
+    }
+  };
 
   return (
     <Layout>
@@ -51,23 +55,35 @@ const Links = () => {
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
-            <TableCell>Code</TableCell>
-            <TableCell>Count</TableCell>
-            <TableCell>Revenue</TableCell>
+            <TableCell>Image</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Price</TableCell>
+            <TableCell>Actions </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {links
+          {products
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) // Adjust data based on current page and rowsPerPage
-            .map((link) => {
+            .map((product) => {
               return (
-                <TableRow key={link.id}>
-                  <TableCell>{link.id}</TableCell>
-                  <TableCell>{link.code}</TableCell>
-                  <TableCell>{link.orders.length}</TableCell>
+                <TableRow key={product.id}>
+                  <TableCell>{product.id}</TableCell>
                   <TableCell>
-                    {link.orders.reduce((s, o) => o.total + s, 0)}
+                    <img src={product.image} width={60} height={60} />
                   </TableCell>
+                  <TableCell>{product.title}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>{product.price}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      style={{ backgroundColor: 'red', color: 'white' }}
+                      onClick={() => handleDelete(product.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>{" "}
                 </TableRow>
               );
             })}
@@ -78,7 +94,7 @@ const Links = () => {
               {/* Use Box to customize the alignment */}
               <Box display="flex" justifyContent="flex-start">
                 <TablePagination
-                  count={links.length}
+                  count={products.length}
                   page={page}
                   onPageChange={handlePageChange}
                   rowsPerPage={rowsPerPage}
@@ -95,4 +111,4 @@ const Links = () => {
   );
 };
 
-export default Links;
+export default Products;
