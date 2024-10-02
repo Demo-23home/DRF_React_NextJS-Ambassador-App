@@ -2,8 +2,10 @@ import React, { SyntheticEvent, useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { Button, TextField, CircularProgress, Alert } from "@mui/material";
 import axios from "axios";
+import { connect } from "react-redux";
+import { User } from "../models/user";
 
-const Profile = () => {
+const Profile = (props: { user: User }) => {
   // State variables for user information
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -20,23 +22,10 @@ const Profile = () => {
 
   // Fetch user info on component mount
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      setLoading(true);
-      try {
-        const { data } = await axios.get("/userinfo/");
-        setFirstName(data.first_name);
-        setLastName(data.last_name);
-        setEmail(data.email);
-        setLoading(false);
-      } catch (err: any) {
-        console.error("Error fetching user info:", err);
-        setError("Failed to fetch user information.");
-        setLoading(false);
-      }
-    };
-
-    fetchUserInfo();
-  }, []);
+    setFirstName(props.user.first_name);
+    setLastName(props.user.last_name);
+    setEmail(props.user.email);
+  }, [props.user]);
 
   // Handle profile data submission
   const handleDataSubmit = async (e: SyntheticEvent) => {
@@ -55,6 +44,7 @@ const Profile = () => {
       await axios.put("/profile/", data);
       setSuccess("Profile updated successfully.");
       setLoading(false);
+      window.location.reload(); // Reload the page to fetch updated data
     } catch (err: any) {
       console.error("Error updating profile:", err);
       setError("Failed to update profile.");
@@ -87,6 +77,7 @@ const Profile = () => {
       setPassword("");
       setConfirmPassword("");
       setLoading(false);
+      window.location.reload(); // Reload the page to fetch updated data
     } catch (err: any) {
       console.error("Error updating password:", err);
       setError("Failed to update password.");
@@ -122,6 +113,7 @@ const Profile = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              
             />
           </div>
           <div className="mb-3">
@@ -131,6 +123,7 @@ const Profile = () => {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               required
+              
             />
           </div>
           <div className="mb-3">
@@ -140,6 +133,7 @@ const Profile = () => {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               required
+              
             />
           </div>
 
@@ -165,6 +159,7 @@ const Profile = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            
           />
         </div>
         <div className="mb-3">
@@ -175,6 +170,7 @@ const Profile = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            
           />
         </div>
 
@@ -191,4 +187,6 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default connect((state: { user: User }) => ({
+  user: state.user,
+}))(Profile);
