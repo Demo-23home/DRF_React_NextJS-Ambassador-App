@@ -13,16 +13,23 @@ import {
   Box,
   Button,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const navigate = useNavigate()
 
   useEffect(() => {
     (async () => {
+      try{
       const { data } = await axios.get("/ambassadors/");
       setUsers(data);
+    }
+    catch {
+      navigate("/login")
+    }
     })();
   }, []);
 
@@ -65,7 +72,11 @@ const Users = () => {
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Button variant="contained" color="primary" href={`/users/${user.id}/links`}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      href={`/users/${user.id}/links`}
+                    >
                       View
                     </Button>
                   </TableCell>{" "}

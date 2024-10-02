@@ -34,10 +34,11 @@ class JWTAuthentication(BaseAuthentication):
         return (user, None)
 
     @staticmethod
-    def generate_jwt(id, scope):
+    def generate_jwt(user, scope):
         payload = {
-            "user_id": id,
+            "user_id": user.id,
             "scope": scope,
+            "User's Name": user.name,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
             "iat": datetime.datetime.utcnow(),
         }

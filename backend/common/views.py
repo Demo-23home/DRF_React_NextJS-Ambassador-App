@@ -39,14 +39,14 @@ class LoginAPIView(APIView):
             if user.is_ambassador and scope == "admin":
                 raise exceptions.AuthenticationFailed("Invalid Scope")
             if user.check_password(password):
-                token = JWTAuthentication.generate_jwt(user.id, scope)
+                token = JWTAuthentication.generate_jwt(user, scope)
                 response = Response()
                 response.set_cookie(
                     key="jwt",
                     value=token,
                     httponly=True,
                     samesite="None",  # Allows cross-site requests
-                    secure= True,  # Secure cookies only in production (HTTPS)
+                    secure=True,  # Secure cookies only in production (HTTPS)
                 )
 
                 response.data = {"Message": "Success"}
@@ -61,15 +61,12 @@ class UserAPIView(APIView):
 
     def get(self, request):
         user = request.user
-        if user is not None:
-            data = UserSerializer(user).data
+        data = UserSerializer(user).data
 
-            if "api/ambassador" in request.path:
-                data["revenue"] = user.revenue
+        if 'api/ambassador' in request.path:
+            data['revenue'] = user.revenue
 
-            return Response(data)
-        else:
-            return Response("No User Found!")
+        return Response(data)
 
 
 class LogOutAPIView(APIView):

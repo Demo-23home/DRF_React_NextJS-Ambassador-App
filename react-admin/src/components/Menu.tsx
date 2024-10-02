@@ -33,6 +33,15 @@ const Menu = () => {
             >
               Orders
             </NavLink>
+          </li>{" "}
+          <li className="nav-item">
+            <NavLink
+              to={"/profile"}
+              className="nav-link active"
+              aria-current="page"
+            >
+              Profile
+            </NavLink>
           </li>
         </ul>
       </div>
