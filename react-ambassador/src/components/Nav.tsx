@@ -1,9 +1,10 @@
 import React, { Dispatch, SyntheticEvent } from "react";
 import { connect } from "react-redux";
 import { User } from "../models/user";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setUser } from "../redux/actions /setUserActions";
+import "../styles/Nav.css"; // Import your custom CSS for styling
 
 const Nav = (props: { user: User; setUser: any }) => {
   let menu;
@@ -16,12 +17,16 @@ const Nav = (props: { user: User; setUser: any }) => {
 
   if (props.user?.id) {
     menu = (
-      <div className="col-md-3 d-flex text-end">
-        <Link to="/rankings/" style={{color:"black"}} className="btn me-2">Ranking</Link>
-        <Link to="/stats/" style={{color:"black"}} className="btn me-2">Stats</Link>
+      <div className="col-md-3 d-flex text-end align-items-center">
+        <Link to="/rankings/" style={{ color: "black" }} className="btn me-2">
+          Ranking
+        </Link>
+        <Link to="/stats/" style={{ color: "black" }} className="btn me-2">
+          Stats
+        </Link>
         <Link
-          to="/Login/"
-          className="btn btn-outline-primary me-2 mr-2"
+          to="/login/"
+          className="btn btn-outline-primary me-2 mr-3"
           onClick={handleLogout}
         >
           Logout
@@ -33,8 +38,8 @@ const Nav = (props: { user: User; setUser: any }) => {
     );
   } else {
     menu = (
-      <div className="col-md-3 text-end">
-        <Link to="/login" className="btn btn-outline-primary me-2 mr-2">
+      <div className="col-md-3 text-end align-items-center">
+        <Link to="/login" className="btn btn-outline-primary me-2 mr-3">
           Login
         </Link>
         <Link to="/register" className="btn btn-primary">
@@ -47,24 +52,28 @@ const Nav = (props: { user: User; setUser: any }) => {
   return (
     <div className="container">
       <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-        <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-          <li>
-            <a
-              href="#"
-              className="nav-link px-2 link-secondary"
+        <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0 d-flex">
+          <li className="mr-3">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `nav-link px-2 link-style ${isActive ? "link-dark" : "link-secondary"}`
+              }
               style={{ color: "black" }}
             >
               Frontend
-            </a>
+            </NavLink>
           </li>
-          <li>
-            <a
-              href="#"
-              className="nav-link px-2 link-secondary"
+          <li className="ml-3">
+            <NavLink
+              to="/backend"
+              className={({ isActive }) =>
+                `nav-link px-2 link-style ml-3 ${isActive ? "link-dark" : "link-secondary"}`
+              }
               style={{ color: "black" }}
             >
               Backend
-            </a>
+            </NavLink>
           </li>
         </ul>
         {menu}
@@ -72,6 +81,7 @@ const Nav = (props: { user: User; setUser: any }) => {
     </div>
   );
 };
+
 export default connect(
   (state: { user: User }) => ({
     user: state.user,

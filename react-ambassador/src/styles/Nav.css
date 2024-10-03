@@ -1,0 +1,12 @@
+.link-style {
+  padding: 8px 16px; /* Uniform padding */
+  line-height: 1.5; /* Ensure consistent height */
+  display: flex; /* Use flexbox to maintain alignment */
+  align-items: center; /* Center content vertically */
+}
+
+.nav-link {
+  min-height: 40px; /* Set a consistent minimum height */
+}
+
+/* Optional: Add additional styles for visual uniformity */
