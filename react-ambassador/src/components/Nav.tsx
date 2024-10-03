@@ -57,7 +57,9 @@ const Nav = (props: { user: User; setUser: any }) => {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `nav-link px-2 link-style ${isActive ? "link-dark" : "link-secondary"}`
+                `nav-link px-2 link-style ${
+                  isActive ? "link-dark" : "link-secondary"
+                }`
               }
               style={{ color: "black" }}
             >
@@ -68,7 +70,9 @@ const Nav = (props: { user: User; setUser: any }) => {
             <NavLink
               to="/backend"
               className={({ isActive }) =>
-                `nav-link px-2 link-style ml-3 ${isActive ? "link-dark" : "link-secondary"}`
+                `nav-link px-2 link-style ml-3 ${
+                  isActive ? "link-dark" : "link-secondary"
+                }`
               }
               style={{ color: "black" }}
             >

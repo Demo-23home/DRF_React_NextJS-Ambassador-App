@@ -5,20 +5,31 @@ import Products from "./Products";
 import axios from "axios";
 
 const ProductsBackend = () => {
-  const [products, setProducts]= useState<Product[]>([])
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const [filters, setFilters] = useState({
+    s: "",
+  });
 
   useEffect(() => {
-    (
-      async () => {
-        const{data} = await axios.get("/products/backend")
-        setProducts(data.data)
+    (async () => {
+      const searchParams: string[] = [];
+
+      if (filters.s) {
+        searchParams.push(`${filters.s}`);
       }
-    )()
-  }, [])
+
+      const { data } = await axios.get(
+        `/products/backend?search=${searchParams.join("&")}`
+      );
+
+      setProducts(data.data);
+    })();
+  }, [filters]);
 
   return (
     <Layout>
-      <Products products={products} />
+      <Products products={products} filters={filters} setFilters={setFilters} />
     </Layout>
   );
 };
