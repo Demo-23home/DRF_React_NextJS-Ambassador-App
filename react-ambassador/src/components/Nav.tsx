@@ -53,12 +53,12 @@ const Nav = (props: { user: User; setUser: any }) => {
     <div className="container">
       <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
         <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0 d-flex">
-          <li className="mr-3">
+          <li className="">
             <NavLink
               to="/"
               className={({ isActive }) =>
                 `nav-link px-2 link-style ${
-                  isActive ? "link-dark" : "link-secondary"
+                  isActive ? "btn btn-primary text-white"  : "link-secondary"
                 }`
               }
               style={{ color: "black" }}
@@ -66,12 +66,12 @@ const Nav = (props: { user: User; setUser: any }) => {
               Frontend
             </NavLink>
           </li>
-          <li className="ml-3">
+          <li className="ml-2">
             <NavLink
               to="/backend"
               className={({ isActive }) =>
                 `nav-link px-2 link-style ml-3 ${
-                  isActive ? "link-dark" : "link-secondary"
+                  isActive ? "btn btn-primary text-white" : "link-secondary"
                 }`
               }
               style={{ color: "black" }}
