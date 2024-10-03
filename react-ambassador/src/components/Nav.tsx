@@ -5,18 +5,20 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setUser } from "../redux/actions /setUserActions";
 
-const Nav = (props: { user: User , setUser:any}) => {
+const Nav = (props: { user: User; setUser: any }) => {
   let menu;
 
   const handleLogout = async (e: SyntheticEvent) => {
     e.preventDefault();
     await axios.post("/logout/");
-    props.setUser(null)
+    props.setUser(null);
   };
 
   if (props.user?.id) {
     menu = (
-      <div className="col-md-3 text-end">
+      <div className="col-md-3 d-flex text-end">
+        <Link to="/rankings/" style={{color:"black"}} className="btn me-2">Ranking</Link>
+        <Link to="/stats/" style={{color:"black"}} className="btn me-2">Stats</Link>
         <Link
           to="/Login/"
           className="btn btn-outline-primary me-2 mr-2"
