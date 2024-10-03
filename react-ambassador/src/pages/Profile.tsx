@@ -1,0 +1,189 @@
+import React, { SyntheticEvent, useEffect, useState } from "react";
+import Layout from "../components/Layout";
+import { Button, TextField, CircularProgress, Alert } from "@mui/material";
+import axios from "axios";
+import { connect } from "react-redux";
+import { User } from "../models/user";
+
+const Profile = (props: { user: User }) => {
+  // State variables for user information
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+
+  // State variables for password update
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // State variables for handling loading and error states
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // Fetch user info on component mount
+  useEffect(() => {
+    setFirstName(props.user.first_name);
+    setLastName(props.user.last_name);
+    setEmail(props.user.email);
+  }, [props.user]);
+
+  // Handle profile data submission
+  const handleDataSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    const data = {
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+    };
+
+    try {
+      await axios.put("/profile/", data);
+      setSuccess("Profile updated successfully.");
+      setLoading(false);
+      window.location.reload(); // Reload the page to fetch updated data
+    } catch (err: any) {
+      console.error("Error updating profile:", err);
+      setError("Failed to update profile.");
+      setLoading(false);
+    }
+  };
+
+  // Handle password submission
+  const handlePasswordSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    // Simple validation
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    const passwordData = {
+      password: password,
+      confirm_password: confirmPassword, // Ensure this matches your backend
+    };
+
+    try {
+      await axios.put("/password/", passwordData);
+      setSuccess("Password updated successfully.");
+      setPassword("");
+      setConfirmPassword("");
+      setLoading(false);
+      window.location.reload(); // Reload the page to fetch updated data
+    } catch (err: any) {
+      console.error("Error updating password:", err);
+      setError("Failed to update password.");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Layout>
+      <h3 className="mt-3">Account Information</h3>
+
+      {error && (
+      <div className="alert alert-danger mb-3">
+        {error}
+      </div>
+      )}
+
+      {success && (
+      <div className="alert alert-success mb-3">
+        {success}
+      </div>
+      )}
+
+      {loading ? (
+      <div className="spinner-border" role="status">
+        <span className="sr-only">Loading...</span>
+      </div>
+      ) : (
+      <form className="mt-3" onSubmit={handleDataSubmit}>
+        <div className="mb-3">
+        <label>Email</label>
+        <input
+          type="email"
+          className="form-control"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        </div>
+        <div className="mb-3">
+        <label>First Name</label>
+        <input
+          type="text"
+          className="form-control"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+        </div>
+        <div className="mb-3">
+        <label>Last Name</label>
+        <input
+          type="text"
+          className="form-control"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
+        </div>
+
+        <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={loading}
+        >
+        {loading ? "Submitting..." : "Submit"}
+        </button>
+      </form>
+      )}
+
+      <h3 className="mt-5">Password Update</h3>
+
+      <form className="mt-3" onSubmit={handlePasswordSubmit}>
+      <div className="mb-3">
+        <label>Password</label>
+        <input
+        type="password"
+        className="form-control"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        />
+      </div>
+      <div className="mb-3">
+        <label>Confirm Password</label>
+        <input
+        type="password"
+        className="form-control"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        required
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={loading}
+      >
+        {loading ? "Submitting..." : "Submit"}
+      </button>
+      </form>
+    </Layout>
+  );
+};
+
+export default connect((state: { user: User }) => ({
+  user: state.user,
+}))(Profile);

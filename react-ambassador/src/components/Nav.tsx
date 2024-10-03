@@ -1,17 +1,17 @@
-import React, { SyntheticEvent } from "react";
+import React, { Dispatch, SyntheticEvent } from "react";
 import { connect } from "react-redux";
 import { User } from "../models/user";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { setUser } from "../redux/actions /setUserActions";
 
-const Nav = (props: { user: User }) => {
+const Nav = (props: { user: User , setUser:any}) => {
   let menu;
-  const navigate = useNavigate();
 
   const handleLogout = async (e: SyntheticEvent) => {
     e.preventDefault();
     await axios.post("/logout/");
-    navigate("/login");
+    props.setUser(null)
   };
 
   if (props.user?.id) {
@@ -32,10 +32,10 @@ const Nav = (props: { user: User }) => {
   } else {
     menu = (
       <div className="col-md-3 text-end">
-        <Link to="/login"  className="btn btn-outline-primary me-2 mr-2">
+        <Link to="/login" className="btn btn-outline-primary me-2 mr-2">
           Login
         </Link>
-        <Link to="/register"  className="btn btn-primary">
+        <Link to="/register" className="btn btn-primary">
           Sign-up
         </Link>
       </div>
@@ -70,6 +70,11 @@ const Nav = (props: { user: User }) => {
     </div>
   );
 };
-export default connect((state: { user: User }) => ({
-  user: state.user,
-}))(Nav);
+export default connect(
+  (state: { user: User }) => ({
+    user: state.user,
+  }),
+  (dispatch: Dispatch<any>) => ({
+    setUser: (user: User) => dispatch(setUser(user)),
+  })
+)(Nav);
