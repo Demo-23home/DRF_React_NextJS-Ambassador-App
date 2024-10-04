@@ -10,30 +10,37 @@ const ProductsBackend = () => {
 
   const [filters, setFilters] = useState<Filters>({
     s: "",
-    sort:"",
+    sort: "",
+    page: 1,
   });
 
   useEffect(() => {
     (async () => {
       const queryParams: string[] = [];
-      
+
       // Search
       if (filters.s) {
         queryParams.push(`search=${filters.s}`);
+        filters.page = 1;
       }
 
       // Sort
-      if (filters.sort){
-        queryParams.push(`sort=${filters.sort}`)
+      if (filters.sort) {
+        queryParams.push(`sort=${filters.sort}`);
+        filters.page = 1;
       }
 
       // queryParams = ["search=qz", "search=qr", "sort=asc" ] => ?"search=qz"&&"search=qr"&&"sort=asc
+
+      if (filters.page) {
+        queryParams.push(`page=${filters.page}`);
+      }
 
       const { data } = await axios.get(
         `/products/backend?${queryParams.join("&")}`
       );
 
-      setProducts(data.data);
+      setProducts(filters.page === 1 ? data.data : [...products, ...data.data]);
     })();
   }, [filters]);
 

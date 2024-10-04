@@ -1,4 +1,5 @@
 export interface Filters {
     s: string;
-    sort: string
+    sort: string; 
+    page: number;
 }
