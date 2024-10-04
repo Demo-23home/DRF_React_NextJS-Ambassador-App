@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Product } from "../models/product";
 import { Filters } from "../models/Filters";
 
@@ -8,6 +8,8 @@ const Products = (props: {
   setFilters: (filters: Filters) => void;
   lastPage: number;
 }) => {
+  const [selected, setSelected] = useState<number[]>([]);
+
   const handleSearch = (s: string) => {
     props.setFilters({
       ...props.filters,
@@ -29,21 +31,22 @@ const Products = (props: {
     });
   };
 
-  let loadButton;
+  const handleSelect = (id: number) => {
+    if (selected.some((s) => s === id)) {
+      setSelected(selected.filter((s) => s !== id));
+    } else {
+      setSelected([...selected, id]);
+    }
+  };
 
-  if (props.filters.page != props.lastPage) {
+  let loadButton;
+  if (props.filters.page !== props.lastPage) {
     loadButton = (
-      <>
-          {console.log("-------")}
-          {console.log(props.filters.page)}
-          {console.log(props.lastPage)}
-          {console.log("-------")}
-        <div className="d-flex mt-4 justify-content-center">
-          <button className="btn btn-primary" onClick={handleLoad}>
-            Load More
-          </button>
-        </div>
-      </>
+      <div className="d-flex mt-4 justify-content-center">
+        <button className="btn btn-primary" onClick={handleLoad}>
+          Load More
+        </button>
+      </div>
     );
   }
 
@@ -69,10 +72,16 @@ const Products = (props: {
       {/* Product Grid */}
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
         {props.products.map((product: Product) => (
-          <div className="col" key={product.id}>
+          <div
+            className="col"
+            key={product.id}
+            onClick={() => handleSelect(product.id)}
+          >
             <div
-              className="card shadow-sm h-100 d-flex flex-column"
-              style={{ height: "400px", width: "400px" }} // Standard height for all cards
+              className={`card shadow-sm h-100 d-flex flex-column ${
+                selected.some((s) => s === product.id) ? "selected" : ""
+              }`}
+              style={{ height: "400px", width: "400px" }}
             >
               <img
                 src={product.image}
@@ -94,6 +103,7 @@ const Products = (props: {
           </div>
         ))}
       </div>
+
       {/* Load More Button */}
       {loadButton}
     </>

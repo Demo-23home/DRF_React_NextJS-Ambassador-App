@@ -15,7 +15,6 @@ from django_redis import get_redis_connection
 import math
 
 
-
 class ProductFrontendAPIView(APIView):
     # authentication_classes = [JWTAuthentication]
     # permission_classes = [IsAuthenticated]
@@ -76,12 +75,8 @@ class ProductBackendAPIView(APIView):
         if page:
             if page == 0:
                 return Response("Not A Valid Page")
-            
+
             last_page = math.ceil(len(products)/products_per_page)
-            # elif page == 1:
-            #     last_page = None
-            # else:
-            #     last_page = page - 1
 
         # Final Response
         data = ProductSerializer(products[start:end], many=True).data
