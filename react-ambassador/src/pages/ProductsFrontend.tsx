@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Filters } from "../models/Filters";
 
 const ProductsFrontend = () => {
+  const [lastPage, setLastPage] = useState(0);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const ProductsFrontend = () => {
         const { data } = await axios.get("/products/frontend");
         setAllProducts(data);
         setFilteredProducts(data);
+        setLastPage(Math.ceil(data.length/perPage))
       })();
     } catch (e) {
       navigate("/login");
@@ -43,7 +45,9 @@ const ProductsFrontend = () => {
     }
 
     setFilteredProducts(products.slice(0, perPage*filters.page));
+    setLastPage(Math.ceil(products.length/perPage))
   }, [filters, allProducts]);
+
 
   return (
     <Layout>
@@ -51,6 +55,7 @@ const ProductsFrontend = () => {
         products={filteredProducts}
         filters={filters}
         setFilters={setFilters}
+        lastPage={lastPage}
       />
     </Layout>
   );

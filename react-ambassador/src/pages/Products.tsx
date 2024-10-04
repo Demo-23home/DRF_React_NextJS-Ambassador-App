@@ -6,6 +6,7 @@ const Products = (props: {
   products: Product[];
   filters: Filters;
   setFilters: (filters: Filters) => void;
+  lastPage: number;
 }) => {
   const handleSearch = (s: string) => {
     props.setFilters({
@@ -27,6 +28,24 @@ const Products = (props: {
       page: props.filters.page + 1,
     });
   };
+
+  let loadButton;
+
+  if (props.filters.page != props.lastPage) {
+    loadButton = (
+      <>
+          {console.log("-------")}
+          {console.log(props.filters.page)}
+          {console.log(props.lastPage)}
+          {console.log("-------")}
+        <div className="d-flex mt-4 justify-content-center">
+          <button className="btn btn-primary" onClick={handleLoad}>
+            Load More
+          </button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -53,7 +72,7 @@ const Products = (props: {
           <div className="col" key={product.id}>
             <div
               className="card shadow-sm h-100 d-flex flex-column"
-              style={{ height: "400px",  width: "400px"}} // Standard height for all cards
+              style={{ height: "400px", width: "400px" }} // Standard height for all cards
             >
               <img
                 src={product.image}
@@ -75,13 +94,8 @@ const Products = (props: {
           </div>
         ))}
       </div>
-
       {/* Load More Button */}
-      <div className="d-flex mt-4 justify-content-center">
-        <button className="btn btn-primary" onClick={handleLoad}>
-          Load More
-        </button>
-      </div>
+      {loadButton}
     </>
   );
 };

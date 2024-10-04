@@ -7,9 +7,13 @@ from core.models import Link, Order, Product, User
 from .serializers import ProductSerializer
 from rest_framework.response import Response
 from django.core.cache import cache
-import time, random, string
+import time
+import random
+import string
 from rest_framework.permissions import IsAuthenticated
 from django_redis import get_redis_connection
+import math
+
 
 
 class ProductFrontendAPIView(APIView):
@@ -32,7 +36,7 @@ class ProductBackendAPIView(APIView):
 
         # Caching Function
         if not products:
-            time.sleep(2)
+            # time.sleep(2)
             products = list(Product.objects.all())
             cache.set("products_backend", products, timeout=60 * 30)  # 30 min
 
@@ -72,10 +76,12 @@ class ProductBackendAPIView(APIView):
         if page:
             if page == 0:
                 return Response("Not A Valid Page")
-            elif page == 1:
-                last_page = None
-            else:
-                last_page = page - 1
+            
+            last_page = math.ceil(len(products)/products_per_page)
+            # elif page == 1:
+            #     last_page = None
+            # else:
+            #     last_page = page - 1
 
         # Final Response
         data = ProductSerializer(products[start:end], many=True).data
@@ -144,7 +150,9 @@ class RankingsAPIView(APIView):
     def get(self, request):
         conn = get_redis_connection("default")
 
-        rankings = conn.zrevrangebyscore("rankings", min=0, max=1000, withscores=True)
+        rankings = conn.zrevrangebyscore(
+            "rankings", min=0, max=1000, withscores=True)
 
-        response = {ranking[0].decode("utf-8"): ranking[1] for ranking in rankings}
+        response = {ranking[0].decode("utf-8"): ranking[1]
+                    for ranking in rankings}
         return Response(response)
