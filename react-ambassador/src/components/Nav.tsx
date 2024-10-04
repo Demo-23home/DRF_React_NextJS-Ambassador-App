@@ -58,7 +58,7 @@ const Nav = (props: { user: User; setUser: any }) => {
               to="/"
               className={({ isActive }) =>
                 `nav-link px-2 link-style ${
-                  isActive ? "btn btn-primary text-white"  : "link-secondary"
+                  isActive ? ""  : "link-secondary color"
                 }`
               }
               style={{ color: "black" }}
@@ -71,7 +71,7 @@ const Nav = (props: { user: User; setUser: any }) => {
               to="/backend"
               className={({ isActive }) =>
                 `nav-link px-2 link-style ml-3 ${
-                  isActive ? "btn btn-primary text-white" : "link-secondary"
+                  isActive ? "" : "link-secondary"
                 }`
               }
               style={{ color: "black" }}

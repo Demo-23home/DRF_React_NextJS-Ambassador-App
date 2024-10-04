@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import axios from "axios";
 import { configureStore } from "./redux/configureStore";
 import { Provider } from "react-redux";
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap here
 
 axios.defaults.baseURL = "http://localhost:8000/api/ambassador";
 axios.defaults.withCredentials = true;

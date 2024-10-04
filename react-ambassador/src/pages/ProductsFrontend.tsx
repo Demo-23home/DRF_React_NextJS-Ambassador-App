@@ -16,6 +16,7 @@ const ProductsFrontend = () => {
     page: 1
   });
 
+  const perPage = 9;
   useEffect(() => {
     try {
       (async () => {
@@ -41,7 +42,7 @@ const ProductsFrontend = () => {
       );
     }
 
-    setFilteredProducts(products);
+    setFilteredProducts(products.slice(0, perPage*filters.page));
   }, [filters, allProducts]);
 
   return (
