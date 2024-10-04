@@ -4,14 +4,15 @@ import Products from "./Products";
 import { Product } from "../models/product";
 import axios, { all } from "axios";
 import { useNavigate } from "react-router-dom";
-import { setPriority } from "os";
+import { Filters } from "../models/Filters";
 
 const ProductsFrontend = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     s: "",
+    sort: "",
   });
 
   useEffect(() => {
