@@ -33,8 +33,15 @@ const ProductsFrontend = () => {
         p.title.toLowerCase().indexOf(filters.s.toLocaleLowerCase()) >= 0 ||
         p.description.toLowerCase().indexOf(filters.s.toLowerCase()) >= 0
     );
+
+    if (filters.sort) {
+      products.sort((a, b) =>
+        filters.sort === "asc" ? a.price - b.price : b.price - a.price
+      );
+    }
+
     setFilteredProducts(products);
-  }, [filters]);
+  }, [filters, allProducts]);
 
   return (
     <Layout>

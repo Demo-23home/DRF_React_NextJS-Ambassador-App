@@ -13,8 +13,8 @@ from django_redis import get_redis_connection
 
 
 class ProductFrontendAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     @method_decorator(cache_page(60 * 60 * 2, key_prefix="products_frontend"))
     def get(self, _):
@@ -24,8 +24,8 @@ class ProductFrontendAPIView(APIView):
 
 
 class ProductBackendAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request):
         products = cache.get("products_backend")
