@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Product } from "../models/product";
 import { Filters } from "../models/Filters";
+import axios from "axios";
 
 const Products = (props: {
   products: Product[];
@@ -9,6 +10,11 @@ const Products = (props: {
   lastPage: number;
 }) => {
   const [selected, setSelected] = useState<number[]>([]);
+  const [notify, setNotify] = useState({
+    error: false,
+    show: false,
+    message: "",
+  });
 
   const handleSearch = (s: string) => {
     props.setFilters({
@@ -39,7 +45,37 @@ const Products = (props: {
     }
   };
 
-  let loadButton;
+  const handleGenerate = async () => {
+    try {
+      const { data } = await axios.post("links/", {
+        products: selected,
+      });
+      setNotify({
+        show: true,
+        error: false,
+        message: `Your Link Has Been Generated!: localhost:5000/${data.code}`,
+      });
+    } catch {
+      setNotify({
+        show: true,
+        error: true,
+        message: "You Must Be Logged In To Generate Links!",
+      });
+    }
+    finally{
+      setTimeout(() => {
+        setNotify({
+          error: false,
+          show: false, 
+          message: ''
+        })
+      }, 3000)
+    }
+  };
+
+  // Define buttons conditionally based on state
+  let loadButton, generateButton, info;
+
   if (props.filters.page !== props.lastPage) {
     loadButton = (
       <div className="d-flex mt-4 justify-content-center">
@@ -50,8 +86,35 @@ const Products = (props: {
     );
   }
 
+  if (selected.length > 0) {
+    generateButton = (
+      <div className="input-group-append">
+        <button className="btn btn-info" onClick={handleGenerate}>
+          Generate Link
+        </button>
+      </div>
+    );
+  }
+
+  if (notify.show) {
+    info = (
+      <div className="col-md-12 mb-4">
+        <div
+          role="alert"
+          className={notify.error ? "alert alert-danger" : "alert alert-info"}
+        >
+          {notify.message}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* Display Notification */}
+      {info}
+
+      {/* Search, Sort, and Generate Button */}
       <div className="col-md-12 mb-4 input-group">
         <input
           type="text"
@@ -59,6 +122,7 @@ const Products = (props: {
           placeholder="search"
           onChange={(e) => handleSearch(e.target.value)}
         />
+        {generateButton}
         <select
           className="form-select ml-2"
           onChange={(e) => handleSort(e.target.value)}
