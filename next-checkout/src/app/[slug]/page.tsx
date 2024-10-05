@@ -6,36 +6,32 @@ import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { useParams } from "next/navigation"; // Import useParams from next/navigation
 import axios from "axios";
 import constants from "../../constants/constants";
+import { Product } from "@/types/products";
+import ProductOrder from "@/types/productOrder";
 
 const DynamicPage = () => {
   const { slug } = useParams(); // Extract the slug parameter from the URL
   const [user, setUser] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [quantities, setQuantities] = useState({}); // State for quantities of each product
+  const [quantities, setQuantities] = useState<{ [key: number]: number }>({}); // State for quantities of each product
 
   useEffect(() => {
     (async () => {
       const { data } = await axios.get(`${constants.baseUrl}/links/${slug}`);
       setUser(data.user);
       setProducts(data.products);
+      
       // Initialize quantities for each product to 1
-      const initialQuantities = data.products.reduce((acc, product) => {
-        acc[product.id] = 1; // Set default quantity to 1
-        return acc;
-      }, {});
+      const initialQuantities: { [key: number]: number } = {}
+      data.products.forEach((product: Product) => {
+        initialQuantities[product.id] = 1; // Set default quantity to 1
+      });
+
       setQuantities(initialQuantities);
       setLoading(false); // Set loading to false after fetching data
     })();
   }, [slug]);
-
-  const handleQuantityChange = (productId, event) => {
-    const value = Math.max(1, event.target.value); // Ensure quantity is at least 1
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: value,
-    }));
-  };
 
   if (!user) {
     return (
@@ -47,7 +43,7 @@ const DynamicPage = () => {
       </div>
     );
   }
-
+  console.log(quantities)
   return (
     <Layout>
       <div className="py-5 text-center">
@@ -78,12 +74,14 @@ const DynamicPage = () => {
                     </label>
                     <input
                       type="number"
-                      className="text-muted form-control d-flex "
                       id={`quantity-${product.id}`}
-                      value={quantities[product.id] || 1} // Use the quantity for this product
-                      style={{ width: '65px' }} // Style for width
-                      onChange={(event) => handleQuantityChange(product.id, event)}
-                      min="1" // Prevent negative or zero values
+                      value={quantities[product.id] || 1} // Set default quantity
+                      onChange={(e) => {
+                        const value = Math.max(1, parseInt(e.target.value) || 1); // Ensure quantity is at least 1
+                        setQuantities((prev) => ({ ...prev, [product.id]: value })); // Update quantity
+                      }}
+                      style={{ width: "65px" }}
+                      className="text-muted form-control d-flex"
                     />
                   </div>
                 </div>
@@ -96,7 +94,7 @@ const DynamicPage = () => {
                 $
                 {products
                   .reduce(
-                    (total, product) => total + parseFloat(product.price) * (quantities[product.id] || 1),
+                    (total:number, product:Product) => total + Number(product.price) * (quantities[product.id] || 1),
                     0
                   )
                   .toFixed(2)}
