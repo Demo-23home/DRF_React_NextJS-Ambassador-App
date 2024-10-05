@@ -11,18 +11,15 @@ from rest_framework import exceptions, status
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import send_mail
-
+import time
 # Create your views here.
 
 
 class LinkAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, _, code):
         link = Link.objects.filter(code=code).first()
         serializer = LinkSerializer(link)
-
+        # time.sleep(2)
         return Response(serializer.data)
 
 
@@ -66,7 +63,8 @@ class OrderAPIView(APIView):
                 order_item.price = product.price
                 order_item.quantity = quantity
                 order_item.product_title = product.title
-                order_item.ambassador_revenue = decimal.Decimal(0.1) * product.price
+                order_item.ambassador_revenue = decimal.Decimal(
+                    0.1) * product.price
                 order_item.admin_revenue = product.price * decimal.Decimal(0.9)
                 with transaction.atomic():
                     order_item.save()
@@ -106,7 +104,8 @@ class OrderAPIView(APIView):
 
 class OrderConfirmAPIView(APIView):
     def post(self, request):
-        order = Order.objects.filter(transaction_id=request.data["source"]).first()
+        order = Order.objects.filter(
+            transaction_id=request.data["source"]).first()
         if not order:
             raise exceptions.APIException("Order not found!")
 

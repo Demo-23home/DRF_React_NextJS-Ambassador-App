@@ -1,14 +1,52 @@
-// src/app/[slug]/page.tsx
 "use client"; // Mark this as a Client Component
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust the import path as needed
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { useParams } from "next/navigation"; // Import useParams from next/navigation
+import axios from "axios";
+import constants from "../../constants/constants";
 
 const DynamicPage = () => {
   const { slug } = useParams(); // Extract the slug parameter from the URL
-  console.log(slug)
+  const [user, setUser] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [quantities, setQuantities] = useState({}); // State for quantities of each product
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await axios.get(`${constants.baseUrl}/links/${slug}`);
+      setUser(data.user);
+      setProducts(data.products);
+      // Initialize quantities for each product to 1
+      const initialQuantities = data.products.reduce((acc, product) => {
+        acc[product.id] = 1; // Set default quantity to 1
+        return acc;
+      }, {});
+      setQuantities(initialQuantities);
+      setLoading(false); // Set loading to false after fetching data
+    })();
+  }, [slug]);
+
+  const handleQuantityChange = (productId, event) => {
+    const value = Math.max(1, event.target.value); // Ensure quantity is at least 1
+    setQuantities((prev) => ({
+      ...prev,
+      [productId]: value,
+    }));
+  };
+
+  if (!user) {
+    return (
+      <div className="text-center my-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h5 className="mt-3">Loading user information...</h5>
+      </div>
+    );
+  }
 
   return (
     <Layout>
@@ -23,17 +61,46 @@ const DynamicPage = () => {
             <span className="text-muted">Products</span>
           </h4>
           <ul className="list-group mb-3">
-            <li className="list-group-item d-flex justify-content-between lh-condensed">
-              <div>
-                <h6 className="my-0">Product name</h6>
-                <small className="text-muted">Brief description</small>
-              </div>
-              <span className="text-muted">$12</span>
-            </li>
-
+            {products.map((product) => (
+              <li
+                className="list-group-item d-flex justify-content-between lh-condensed"
+                key={product.id}
+              >
+                <div>
+                  <h6 className="my-0">{product.title}</h6>
+                  <small className="text-muted">{product.description}</small>
+                  <div className="mt-2 d-flex align-items-center">
+                    <label
+                      htmlFor={`quantity-${product.id}`}
+                      className="form-label mb-0 me-2 d-flex"
+                    >
+                      Quantity:
+                    </label>
+                    <input
+                      type="number"
+                      className="text-muted form-control d-flex "
+                      id={`quantity-${product.id}`}
+                      value={quantities[product.id] || 1} // Use the quantity for this product
+                      style={{ width: '65px' }} // Style for width
+                      onChange={(event) => handleQuantityChange(product.id, event)}
+                      min="1" // Prevent negative or zero values
+                    />
+                  </div>
+                </div>
+                <span className="text-muted">${product.price}</span>
+              </li>
+            ))}
             <li className="list-group-item d-flex justify-content-between">
               <span>Total (USD)</span>
-              <strong>$20</strong>
+              <strong>
+                $
+                {products
+                  .reduce(
+                    (total, product) => total + parseFloat(product.price) * (quantities[product.id] || 1),
+                    0
+                  )
+                  .toFixed(2)}
+              </strong>
             </li>
           </ul>
         </div>
@@ -62,7 +129,6 @@ const DynamicPage = () => {
                 />
               </div>
             </div>
-
             <div className="mb-3">
               <label htmlFor="email">
                 Email <span className="text-muted">(Optional)</span>
@@ -77,7 +143,6 @@ const DynamicPage = () => {
                 Please enter a valid email address for shipping updates.
               </div>
             </div>
-
             <div className="mb-3">
               <label htmlFor="address">Address</label>
               <input
@@ -91,7 +156,6 @@ const DynamicPage = () => {
                 Please enter your shipping address.
               </div>
             </div>
-
             <div className="row">
               <div className="col-md-5 mb-3">
                 <label htmlFor="country">Country</label>
