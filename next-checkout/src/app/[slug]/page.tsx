@@ -8,6 +8,9 @@ import axios, { AxiosHeaders } from "axios";
 import constants from "../../constants/constants";
 import { Product } from "@/types/products";
 import ProductOrder from "@/types/productOrder";
+import { loadStripe } from "@stripe/stripe-js"; // Import Stripe loader
+
+const stripePromise = loadStripe(constants.stripeKey); // Load Stripe with your publishable key
 
 const DynamicPage = () => {
   const { slug } = useParams(); // Extract the slug parameter from the URL
@@ -68,7 +71,10 @@ const DynamicPage = () => {
       products: productOrder,
     });
 
-    console.log("response:", data);
+    const stripe = await stripePromise;
+    stripe?.redirectToCheckout({
+      sessionId: data.id,
+    });
   };
 
   if (!user) {

@@ -77,7 +77,7 @@ class OrderAPIView(APIView):
                                 "description": product.description,
                                 "images": [product.image],
                             },
-                            "unit_amount": int(product.price),
+                            "unit_amount": int(product.price * 100),
                         },
                         "quantity": int(quantity),
                     }

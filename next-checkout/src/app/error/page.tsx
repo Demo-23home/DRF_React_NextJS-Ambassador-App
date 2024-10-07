@@ -1,5 +1,7 @@
+"use client"; // Ensure this component is a Client Component
+
 import React from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"; // Updated import
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const ErrorPage = () => {

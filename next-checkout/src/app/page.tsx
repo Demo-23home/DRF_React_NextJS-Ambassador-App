@@ -2,6 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import Layout from "../components/Layout"; // Import your Layout component
 
+
 const HomePage = () => {
   return (
     <Layout>
