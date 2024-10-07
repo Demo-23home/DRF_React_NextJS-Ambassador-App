@@ -129,7 +129,95 @@
 
 
 
-version: '3.8'  # Ensure to use a supported version; remove if obsolete warnings arise
+# version: '3.8'  # Ensure to use a supported version; remove if obsolete warnings arise
+
+# services:
+#   backend:
+#     build:
+#       context: .
+#       dockerfile: backend.Dockerfile
+#     volumes:
+#       - ./backend:/app
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       POSTGRES_NAME: ${POSTGRES_NAME}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#       POSTGRES_HOST: db
+#       POSTGRES_PORT: 5432
+#     depends_on:
+#       - db
+#       - redis
+
+#   db:
+#     image: postgres:latest
+#     volumes:
+#       - ./backend/dbdata:/var/lib/postgresql/data
+#     environment:
+#       POSTGRES_DB: ${POSTGRES_NAME}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     ports:
+#       - "5434:5432"
+
+#   redis:
+#     image: redis:latest
+#     ports:
+#       - "6378:6379"
+
+#   react-ambassador:
+#     build:
+#       context: .
+#       dockerfile: frontend.Dockerfile
+#     working_dir: /app/react-ambassador
+#     command: npm start
+#     ports:
+#       - "4000:4000"
+#     depends_on:
+#       - backend
+#     environment:
+#       - PORT=4000
+#     volumes:
+#       - ./react-ambassador:/app/react-ambassador
+#       - /app/react-ambassador/node_modules
+
+#   react-admin:
+#     build:
+#       context: .
+#       dockerfile: frontend.Dockerfile
+#     working_dir: /app/react-admin
+#     command: npm start
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - backend
+#     environment:
+#       - PORT=3000
+#     volumes:
+#       - ./react-admin:/app/react-admin
+#       - /app/react-admin/node_modules
+
+#   next-checkout:
+#     build:
+#       context: .
+#       dockerfile: frontend.Dockerfile
+#     working_dir: /app/next-checkout
+#     command: npm run dev
+#     ports:
+#       - "5000:5000"
+#     depends_on:
+#       - backend
+#     environment:
+#       - PORT=5000
+#       # - NEXT_PUBLIC_API_URL=http://backend:8000/api
+#     # volumes:
+#     # - ./next-checkout:/app/next-checkout
+#       # - ./next-checkout:/app/next-checkout
+#       # - /app/next-checkout/node_modules
+
+
+version: '3.8'
 
 services:
   backend:
@@ -146,9 +234,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
+      EMAIL_HOST: mailhog  # Use MailHog service name
+      EMAIL_PORT: 1025      # MailHog SMTP port
     depends_on:
       - db
       - redis
+      - mailhog  # Add dependency on MailHog
 
   db:
     image: postgres:latest
@@ -165,6 +256,13 @@ services:
     image: redis:latest
     ports:
       - "6378:6379"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"  # Web interface
+    environment:
+      - MH_HTTP_BIND_ADDR=0.0.0.0:8025  # Bind to all interfaces
 
   react-ambassador:
     build:
@@ -210,8 +308,3 @@ services:
       - backend
     environment:
       - PORT=5000
-      # - NEXT_PUBLIC_API_URL=http://backend:8000/api
-    # volumes:
-    # - ./next-checkout:/app/next-checkout
-      # - ./next-checkout:/app/next-checkout
-      # - /app/next-checkout/node_modules

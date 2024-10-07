@@ -184,12 +184,20 @@ REST_FRAMEWORK = {
 STRIPE_SECRETEKEY = os.environ.get("STRIPE_SECRETEKEY")
 
 
+# # MailHog Configurations
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+# # Use the Docker host to connect to MailHog running on your local machine
+# EMAIL_HOST = "172.17.0.1"  # Replace with your actual Docker host IP
+
+# EMAIL_PORT = 1025
+
+# EMAIL_USE_TLS = False
+
 # MailHog Configurations
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# Use the Docker host to connect to MailHog running on your local machine
-EMAIL_HOST = "172.17.0.1"  # Replace with your actual Docker host IP
-
-EMAIL_PORT = 1025
-
+# Default to localhost for local development
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 1025)
+                 )  # Default to 1025 for MailHog
 EMAIL_USE_TLS = False
