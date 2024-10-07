@@ -18,9 +18,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/admin/", include("administrator.urls")),
     path("api/ambassador/", include("ambassador.urls")),
     path("api/checkout/", include("checkout.urls")),
+
+    # API schema and documentation
+    path("schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),  # Swagger UI
+    path("swagger/", SpectacularRedocView.as_view(url_name="schema"),name="redoc"),  # Redoc UI
 ]
+
+
+# Serve static and media files during development
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

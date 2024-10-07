@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     # External Modules
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",  # API schema/documentation
+
 ]
 
 MIDDLEWARE = [
@@ -85,6 +87,14 @@ TEMPLATES = [
 WSGI_APPLICATION = "app.wsgi.application"
 
 
+# DRF Spectacular settings for API documentation
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Ambassador App",
+    "DESCRIPTION": """this is ambassador app made with Django Rest Framework, React, NextJS.""",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
+}
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -114,7 +124,8 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/0",  # Use the service name and internal port here
+        # Use the service name and internal port here
+        "LOCATION": "redis://redis:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -174,8 +185,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # RESTframework AuthenticataionClasses
 # Django Rest Framework settings
+# Django Rest Framework settings
 REST_FRAMEWORK = {
-    # "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
     ),
@@ -183,16 +195,6 @@ REST_FRAMEWORK = {
 
 STRIPE_SECRETEKEY = os.environ.get("STRIPE_SECRETEKEY")
 
-
-# # MailHog Configurations
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# # Use the Docker host to connect to MailHog running on your local machine
-# EMAIL_HOST = "172.17.0.1"  # Replace with your actual Docker host IP
-
-# EMAIL_PORT = 1025
-
-# EMAIL_USE_TLS = False
 
 # MailHog Configurations
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
