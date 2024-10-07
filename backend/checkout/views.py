@@ -3,15 +3,15 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 import stripe
 import stripe.checkout
-from .serializers import LinkSerializer, OrderSerializer
+from .serializers import LinkSerializer
 from common.Authentication import JWTAuthentication
 from core.models import Link, Order, OrderItem, Product
 from rest_framework.response import Response
-from rest_framework import exceptions, status
+from rest_framework import exceptions
 from django.db import transaction
 from django.conf import settings
 from django.core.mail import send_mail
-import time
+# import time
 # Create your views here.
 
 
@@ -24,16 +24,15 @@ class LinkAPIView(APIView):
 
 
 class OrderAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
 
     @transaction.atomic
     def post(self, request):
         try:
             data = request.data
-            code = data["code"]
-            link = Link.objects.filter(code=code).first()
-            user = request.user
+            # code = data["code"]
+            link = Link.objects.filter(code=data['code']).first()
             products = data["products"]
 
             if not link:
@@ -41,7 +40,7 @@ class OrderAPIView(APIView):
 
             order = Order()
             order.code = link.code
-            order.user = user
+            order.user = link.user
             order.ambassador_email = link.user.email
             order.first_name = data["first_name"]
             order.last_name = data["last_name"]
@@ -97,7 +96,7 @@ class OrderAPIView(APIView):
                 order.transaction_id = source["id"]
             order.save()
             return Response(source)
-        except:
+        except:  # noqa: E722
             transaction.rollback()
         return Response("Error Occurred")
 

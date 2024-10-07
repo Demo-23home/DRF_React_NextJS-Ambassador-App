@@ -1,10 +1,10 @@
 "use client"; // Mark this as a Client Component
 
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust the import path as needed
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { useParams } from "next/navigation"; // Import useParams from next/navigation
-import axios from "axios";
+import axios, { AxiosHeaders } from "axios";
 import constants from "../../constants/constants";
 import { Product } from "@/types/products";
 import ProductOrder from "@/types/productOrder";
@@ -15,15 +15,25 @@ const DynamicPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({}); // State for quantities of each product
+  const [productOrder, setProductOrder] = useState<ProductOrder[]>([]); // State for product orders
+
+  // State for personal information
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [zip, setZip] = useState("");
 
   useEffect(() => {
     (async () => {
       const { data } = await axios.get(`${constants.baseUrl}/links/${slug}`);
       setUser(data.user);
       setProducts(data.products);
-      
+
       // Initialize quantities for each product to 1
-      const initialQuantities: { [key: number]: number } = {}
+      const initialQuantities: { [key: number]: number } = {};
       data.products.forEach((product: Product) => {
         initialQuantities[product.id] = 1; // Set default quantity to 1
       });
@@ -32,6 +42,34 @@ const DynamicPage = () => {
       setLoading(false); // Set loading to false after fetching data
     })();
   }, [slug]);
+
+  // Update productOrder state whenever quantities change
+  useEffect(() => {
+    const orders = products.map((product) => ({
+      product_id: product.id,
+      quantity: quantities[product.id] || 1, // Default to 1 if quantity is not set
+    }));
+    setProductOrder(orders);
+  }, [quantities, products]); // Dependency array to track changes in quantities and products
+
+  // Handle form submission
+  const handleSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+
+    const { data } = await axios.post(`${constants.baseUrl}/orders/`, {
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      address: address,
+      country: country,
+      city: city,
+      zip: zip,
+      code: slug,
+      products: productOrder,
+    });
+
+    console.log("response:", data);
+  };
 
   if (!user) {
     return (
@@ -43,12 +81,16 @@ const DynamicPage = () => {
       </div>
     );
   }
-  console.log(quantities)
+
   return (
     <Layout>
       <div className="py-5 text-center">
         <h2>Welcome</h2>
-        <p className="lead">Has Invited You To Buy These Products</p>
+        <p className="lead">
+          {" "}
+          {user.first_name} {user.last_name} Has Invited You To Buy These
+          Products
+        </p>
       </div>
 
       <div className="row">
@@ -77,8 +119,14 @@ const DynamicPage = () => {
                       id={`quantity-${product.id}`}
                       value={quantities[product.id] || 1} // Set default quantity
                       onChange={(e) => {
-                        const value = Math.max(1, parseInt(e.target.value) || 1); // Ensure quantity is at least 1
-                        setQuantities((prev) => ({ ...prev, [product.id]: value })); // Update quantity
+                        const value = Math.max(
+                          1,
+                          parseInt(e.target.value) || 1
+                        ); // Ensure quantity is at least 1
+                        setQuantities((prev) => ({
+                          ...prev,
+                          [product.id]: value,
+                        })); // Update quantity
                       }}
                       style={{ width: "65px" }}
                       className="text-muted form-control d-flex"
@@ -94,7 +142,9 @@ const DynamicPage = () => {
                 $
                 {products
                   .reduce(
-                    (total:number, product:Product) => total + Number(product.price) * (quantities[product.id] || 1),
+                    (total: number, product: Product) =>
+                      total +
+                      Number(product.price) * (quantities[product.id] || 1),
                     0
                   )
                   .toFixed(2)}
@@ -104,7 +154,7 @@ const DynamicPage = () => {
         </div>
         <div className="col-md-8 order-md-1">
           <h4 className="mb-3">Personal Info</h4>
-          <form className="needs-validation" noValidate>
+          <form className="needs-validation" noValidate onSubmit={handleSubmit}>
             <div className="row">
               <div className="col-md-6 mb-3">
                 <label htmlFor="firstName">First name</label>
@@ -113,6 +163,8 @@ const DynamicPage = () => {
                   className="form-control"
                   id="firstName"
                   placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)} // Update first name
                   required
                 />
               </div>
@@ -123,6 +175,8 @@ const DynamicPage = () => {
                   className="form-control"
                   id="lastName"
                   placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)} // Update last name
                   required
                 />
               </div>
@@ -136,6 +190,8 @@ const DynamicPage = () => {
                 className="form-control"
                 id="email"
                 placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} // Update email
               />
               <div className="invalid-feedback">
                 Please enter a valid email address for shipping updates.
@@ -148,6 +204,8 @@ const DynamicPage = () => {
                 className="form-control"
                 id="address"
                 placeholder="1234 Main St"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)} // Update address
                 required
               />
               <div className="invalid-feedback">
@@ -162,6 +220,8 @@ const DynamicPage = () => {
                   className="form-control"
                   id="country"
                   placeholder="Country"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)} // Update country
                   required
                 />
               </div>
@@ -172,6 +232,8 @@ const DynamicPage = () => {
                   className="form-control"
                   id="city"
                   placeholder="City"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)} // Update city
                   required
                 />
               </div>
@@ -182,12 +244,14 @@ const DynamicPage = () => {
                   className="form-control"
                   id="zip"
                   placeholder="ZIP"
+                  value={zip}
+                  onChange={(e) => setZip(e.target.value)} // Update zip code
                 />
               </div>
             </div>
             <hr className="mb-20" />
             <button className="btn btn-primary btn-lg w-100" type="submit">
-              Continue to checkout
+              Place Order
             </button>
           </form>
         </div>
@@ -197,3 +261,4 @@ const DynamicPage = () => {
 };
 
 export default DynamicPage;
+//
