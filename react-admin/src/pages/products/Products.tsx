@@ -46,7 +46,7 @@ const Products = () => {
   const handleDelete = (id: number) => {
     if (window.confirm("Are you Sure ?")) {
       axios.delete(`products/${id}/`);
-      setProducts(products.filter((product) => product.id != id));
+      setProducts(products.filter((product) => product.id !== id));
     }
   };
 
